@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+{% load greaterthan %}
+{% load staticfiles %}
+<head>
+<title>Home Page - User Timeline</title>
+<style>
+#tweet_table td {
+	color:white;
+	border: 1px solid white;
+}
+p
+{
+text-align: right;
+}
+.image
+{
+width: 100px;
+height: 100px;
+border-radius: 50%;
+background-image: url({{pagedata.profile_image_url}});
+background-position: center center;
+}
+table.tweet_table tbody
+{
+overflow:scroll;
+height:10px;
+}
+input
+{
+color: grey;
+}
+body{
+font-size: 15px;
+background: #b3dced; /* Old browsers */
+background: -moz-linear-gradient(top, #b3dced 0%, #29b8e5 50%, #bce0ee 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#b3dced), color-stop(50%,#29b8e5), color-stop(100%,#bce0ee)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, #b3dced 0%,#29b8e5 50%,#bce0ee 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, #b3dced 0%,#29b8e5 50%,#bce0ee 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, #b3dced 0%,#29b8e5 50%,#bce0ee 100%); /* IE10+ */
+background: linear-gradient(to bottom, #b3dced 0%,#29b8e5 50%,#bce0ee 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b3dced', endColorstr='#bce0ee',GradientType=0 ); /* IE6-9 */
+}
+</style>
+</head>
+<body>
+<form id="twitter_home" name="twitter_home" method="GET" action="/home	">
+<table>
+<tbody>
+<tr>
+<td class="image"></td>
+<td></td>
+<td></td>
+<td valign="bottom";><h1>Welcome <a href="https://twitter.com/{{user}}" target="_blank">{{user.get_full_name}}</a></h1></td>
+<td></td>
+<td valign="top"><MARQUEE>WorldWide Trends: {% for each_trend in pagedata.world_wide_trend %} <a href={{each_trend.url}}, target='_blank'>{{each_trend.name}}</a> {% endfor %} &nbsp;&nbsp;  You joined twitter at {{pagedata.user_details.created_at|date:'l-F,d,Y'}} &nbsp;&nbsp;You have {{pagedata.followers_count}} Followers &nbsp;&nbsp; {{pagedata.friends_count}} friends following you &nbsp;&nbsp;You have {{pagedata.status}} status</MARQUEE></td>
+<td valign="top">
+<br>
+<a style="float:right;" href="/update_status">Tweet</a>
+<br>
+<a style="float:right;" href="/logout">Logout</a>
+<br>
+{% if pagedata.status|gt:0 %}
+<button type="button" style="background-color:lightblue;float:right;" align="center" id="deletebtn" onclick="DeleteReinsDetails()">DeleteTweets</button>
+{% endif %}
+</td>
+</tr>
+</tbody>
+</table>
+<br>
+<br>	
+<div id="followers_div" style="float:left;margin:0 auto;height:400px;overflow:auto;border:1px dotted grey; background-color:blacks;border-radius:4px;width:250px;">
+<h2 style="color:blue;" align="center">Follwers</h2>
+{% if pagedata.followers_count|gt:0 %}
+{% for each_user in pagedata.followers %}
+<ul>
+<li style="color:white;float:center;">{{each_user.name}}<a style="float:right;" href="https://twitter.com/{{each_user.screen_name}}" target="_blank">{{each_user.screen_name}}</a></li>
+</ul>
+{% endfor %}
+{% else %}
+<p style="color:white;text-align:center;">There are no Followers</p>
+{% endif %}
+</div>
+<div></div>
+<div id="friends_div" style="float:left;margin:0 auto;height:400px;overflow:auto;border:1px dotted grey; background-color:blacks;border-radius:4px;width:240px;">
+<h2 style="color:blue;" align="center">Follwing</h2>
+{% if pagedata.friends_count|gt:0 %}
+{% for each_user in pagedata.following %}
+<ul>
+<li style="color:white;float:center;">{{each_user.name}}<a style="float:right;" href="https://twitter.com/{{each_user.screen_name}}" target="_blank">{{each_user.screen_name}}</a></li>
+</ul>
+{% endfor %}
+{% else %}
+<p style="color:black;text-align:center;">No one is following you</p>
+{% endif %}
+</div>
+<div id="tweet_div" align="center" style="margin:0 auto;height:400px;overflow:auto;border:1px dotted grey; background-color:blacks;border-radius:4px;width:490px;">
+<h3 style="color:blue;">Here are your Tweet(s)</h3>
+<table id="tweet_table" name="tweet_table" title="Tweet(s)" style="height:300px;background-color:black;" class="filterable" width="500" cellspacing="0" cellpadding="0" align="center">
+<tbody>
+<div>
+{% if pagedata.timeline %}
+{% for each in pagedata.timeline %}
+<tr>
+<td align="center"><input type="checkbox" id="delete{{ each.id }}" value="{{ each.id }}" onclick="check_delete_det('{{ each.id }}');"/></td>
+<td><p style="text-align: center;">{{each.text | safe}}</p></td>
+<td align="center">{% if each.retweeted %} retweeted {% elif each.in_reply_to_status_id %} replied {% else %} tweeted {% endif %} on {{each.created_at|date:'l-F,d,Y'}}</td>
+</tr>
+{% endfor %}
+{% else %}
+<tr>
+<td><p style="text-align: center;">There is no <a href="/update_status">tweets</a> posted by you</p></td>
+</td>
+</tr>
+{% endif %}
+</div>
+</tbody>
+</table>
+</div>
+<input type="hidden" name="delete_tweets" id="delete_tweets" >  	
+</form>
+</body>
+<script type="text/javascript" src="/static/js/filterTable.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery.fullbg.min.js"></script>
+<script type="text/javascript">
+if (screen.width==1360)
+{
+$('#tweet_div').css('width',"530px");
+$('#friends_div').css('width',"350px");
+$('#followers_div').css('width',"350px");
+}
+function autoRefresh() {
+    window.location = '/home/?auto_update=true';
+}
+if ('{{pagedata.auto_update}}'=='true')
+{
+'{% ifequal pagedata.is_update True %}'
+   alert('There is a update') 
+ '{% else %}'
+	 alert('There is no update')
+ '{% endifequal %}'
+}
+$('input').val('Search your Tweet(s)')
+$('#delete_tweets').val('');
+
+if ('{{pagedata.can_auto_update}}'=='True')
+{
+setInterval('autoRefresh()','{{pagedata.auto_update_period}}');
+}
+
+function altRows(id){
+	if(document.getElementsByTagName){  
+		
+		var table = document.getElementById(id);  
+		var rows = table.getElementsByTagName("tr"); 
+		 
+		for(i = 0; i < rows.length; i++){          
+			if(i % 2 == 0){
+				rows[i].className = "evenrowcolor";
+			}else{
+				rows[i].className = "oddrowcolor";
+			}      
+		}
+	}
+}
+function check_delete_det(reins_id){
+	if ($("#delete" + reins_id).is(':checked')){
+		$('#delete_tweets').val($('#delete_tweets').val() + ',' + reins_id);
+	}
+	else{
+		$('#delete_tweets').val($('#delete_tweets').val().replace(reins_id,','))
+	}
+}
+
+function DeleteReinsDetails(obj,reins_id){
+	if ($('#delete_tweets').val().replace(/\,/g,'') == ''){
+		alert('Please select tweet(s) to delete.')
+	}
+	else{
+      if (($(":checkbox:checked").length) > 3) {
+         alert('only 3 tweets can be delete at a time')
+      }	
+      else {
+		var res = confirm('Are you sure you want to delete the selected tweet(s)?');
+		    if(res)
+		    {
+			 $('#twitter_home').attr('action', '/delete/');
+	 		 $('#twitter_home').submit();
+		    }
+		 }
+	}
+}
+$('input').focusin(function() {
+    if ( this.value == 'Search your Tweet(s)' ) {
+        this.value = ''; 
+        $(this).css({"color":"black"});   
+    }
+});
+$('input').focusout(function() {
+    if ( this.value == '' ) {
+        this.value = 'Search your Tweet(s)';
+        $(this).css({"color":"grey"});
+    }
+});
+</script>
+</html>

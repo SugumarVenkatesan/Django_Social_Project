@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+{% load staticfiles %}
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Login Page</title>
+<style type="text/css">
+.fullBg {
+	position: fixed;
+	top: 0;
+	left: 0;
+	overflow: hidden;
+}
+
+#maincontent {
+	position: absolute;
+	bottom: 170px;
+	top: 120px;
+	left: 0;
+	z-index: 50;
+	width: 100%;
+	background: skyblue;
+	opacity: 0.9; 
+	filter: alpha(opacity=90);
+	}
+
+#box {
+	width: 600px;
+	margin: auto;
+	padding: 0 10px;
+	}
+	
+h1 { 
+	margin-top: 12px;
+	font-size: 40px;
+	text-align: center;
+	line-height: 44px;
+	font-weight: normal;
+	font-family: Georgia,serif;
+	color: #222;
+	}
+	
+h2 { 
+	margin-top: 0;
+	font-size: 24px;
+	line-height: 28px;
+	font-weight: normal;
+	font-family: Georgia,serif;
+	color: darkblue;
+	}
+
+a {
+	text-decoration: none;
+	outline: none;
+	color: darkblue;
+	}
+	
+	a:hover {
+		text-decoration: underline;
+		}
+</style>
+</head>
+
+<body>
+<img src="{% static "images/images.jpg" %}" id="background">
+<div id="maincontent">
+    <div id="box">
+        <br>
+        <h1>Twitter app with Python Social Auth and Tweepy</h1>
+        <h2>Description</h2>
+        This application would show the logged in user timeline and auto update it by auto page refreshing at the rate of every {{pagedata.auto_update_period_in_min}} minutes. We can tweet from this application on clicking the <a>tweet</a> button in home page. we can also delete the selected tweet(s) from this application with the usage of <a>Delete Tweets</a> . Click the below hyperlink to log in your twitter account.
+        <br>
+	     <p>{% if user and not user.is_anonymous %}
+		  <a>Hello, {{ user.get_full_name }}!</a>
+		  <a href="/logout">&laquo; Logout</a>
+			{% else %}
+			<a href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}">&laquo; Login with Twitter</a>
+			{% endif %}
+			</p>
+			<br>
+			<br>
+		</div>
+</div>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery.fullbg.min.js"></script>
+<script type="text/javascript">
+$(window).load(function() {
+	$("#background").fullBg();
+});
+</script>
+</body>
+</html>
